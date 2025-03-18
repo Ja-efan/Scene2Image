@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scene 기반 이미지 생성 API</title>
+    <style>
+        body {
+            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            margin: 15px 0;
+        }
+        .endpoint {
+            background-color: #e8f4fd;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: inline-block;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .method {
+            background-color: #4caf50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .info-box {
+            background-color: #e8f4fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }
+        .feature-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .feature-list li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #3498db;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Scene 기반 이미지 생성 API</h1>
+        
+        <div class="info-box">
+            <h2>API 개요</h2>
+            <p>이 API는 장면(Scene) 정보를 기반으로 이미지를 자동 생성하는 서비스를 제공합니다. Spring Boot 백엔드로부터 Scene 데이터를 수신하여 OpenAI와 KLING AI를 활용해 고품질 이미지를 생성합니다.</p>
+            
+            <h3>주요 기능</h3>
+            <ul class="feature-list">
+                <li>장면 정보 기반 이미지 프롬프트 자동 생성 (OpenAI)</li>
+                <li>생성된 프롬프트 기반 이미지 생성 (KLING AI)</li>
+                <li>로컬 저장소 및 AWS S3 스토리지 연동</li>
+                <li>RESTful API 인터페이스</li>
+            </ul>
+        </div>
+        
+        <h2>API 엔드포인트</h2>
+        
+        <div>
+            <div class="endpoint">
+                <span class="method">POST</span> /api/v1/images/generate-image
+            </div>
+            <p>장면 정보를 기반으로 이미지를 생성합니다.</p>
+            
+            <h3>요청 본문 예시</h3>
+            <pre class="code-block">
+{
+  "script_metadata": {
+    "title": "회사에서의 하루",
+    "script_id": 1,
+    "characters": [
+      {
+        "name": "박대리",
+        "gender": 1,  // 1: 남성, 2: 여성
+        "description": "30대 초반의 남성, 검은 정장을 입고 있음, 단정한 헤어스타일, 안경을 착용"
+      },
+      {
+        "name": "김부장",
+        "gender": 2,
+        "description": "40대 중반의 여성, 회색 정장을 입고 있음, 긴 머리를 묶고 있음, 화려한 시계 착용"
+      }
+    ]
+  },
+  "scene_id": 1,
+  "audios": [
+    {
+      "type": "narration",
+      "text": "월요일 아침, 출근한 김부장이 표정이 썩은채로 이야기를 한다."
+    },
+    {
+      "type": "dialogue",
+      "character": "김부장",
+      "text": "내가 지난 주말에 쏘카에서 아반떼 N을 빌려서 타봤는데 말이야...",
+      "emotion": "sad"
+    },
+    {
+      "type": "sound",
+      "text": "배기음을 내며 달리는 자동차 소리"
+    }
+  ]
+}</pre>
+            
+            <h3>응답 예시</h3>
+            <pre class="code-block">
+{
+  "scene_id": 1,
+  "image_prompt": "An office setting on a Monday morning. A middle-aged woman in her 40s wearing a gray suit...",
+  "image_s3url": "https://jaefan-b106-images.s3.ap-northeast-2.amazonaws.com/scripts/1/scenes/1/scene_1_abcd1234.png"
+}</pre>
+        </div>
+        
+        <h2>API 사용 방법</h2>
+        <p>API 요청 시 다음과 같은 cURL 명령어를 사용할 수 있습니다:</p>
+        <pre class="code-block">
+curl -X POST "http://localhost:8000/api/v1/images/generate-image" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "script_metadata": {
+         "title": "회사에서의 하루",
+         "script_id": 1,
+         "characters": [
+           {
+             "name": "박대리",
+             "gender": 1,
+             "description": "30대 초반의 남성, 검은 정장을 입고 있음"
+           }
+         ]
+       },
+       "scene_id": 1,
+       "audios": [
+         {
+           "type": "narration",
+           "text": "월요일 아침, 출근한 박대리가 피곤한 표정을 짓고 있다."
+         }
+       ]
+     }'</pre>
+    </div>
+    
+    <div class="container">
+        <h2>프로세스 흐름</h2>
+        <ol>
+            <li>Spring Boot 백엔드로부터 Scene 객체 수신</li>
+            <li>OpenAI를 사용하여 이미지 프롬프트 생성</li>
+            <li>KLING AI를 사용하여 이미지 생성</li>
+            <li>생성된 이미지를 로컬에 저장</li>
+            <li>이미지를 AWS S3에 업로드</li>
+            <li>결과 정보를 Spring Boot 백엔드로 반환</li>
+        </ol>
+    </div>
+    
+    <div class="footer">
+        <p>© 2024 Scene 기반 이미지 생성 API | <a href="/docs" target="_blank">API 문서</a> | <a href="/api/v1/docs" target="_blank">Swagger UI</a></p>
+    </div>
+</body>
+</html> 
