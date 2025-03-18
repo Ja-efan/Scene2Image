@@ -102,27 +102,6 @@ class ImageService:
             except:
                 raise HTTPException(status_code=500, detail="응답 데이터 파싱 오류")
             
-
-
-            # #########################################################
-            # # 태스크 ID 가져오기
-            # if response_code == 0 and "data" in response_data:
-            #     task_id = response_data["data"]["task_id"]
-                
-            #     # 이미지 생성 완료될 때까지 기다리기
-            #     image_urls = await ImageService.get_task_result(task_id)
-                
-            #     if image_urls and len(image_urls) > 0:
-            #         print(f"이미지 생성 완료: {image_urls[0]['url']}")
-            #         return {
-            #             "image_url": image_urls[0]["url"],
-            #             "prompt": prompt
-            #         }
-            #     else:
-            #         raise HTTPException(status_code=500, detail="이미지 생성 시간 초과")
-            # else:
-            #     raise HTTPException(status_code=500, detail="태스크 ID를 찾을 수 없습니다.")
-            # #########################################################
         except HTTPException:
             raise
         except Exception as e:
